@@ -2,27 +2,29 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const { saltHashPassword, randomString } = require('../helpers/store')
 const Users = require('../models/users')
-const passportJWT = require("passport-jwt");
-const JWTStrategy = passportJWT.Strategy;
-const ExtractJWT = passportJWT.ExtractJwt;
+const JwtStrategy = require("passport-jwt").Strategy;
+const ExtractJwt = require("passport-jwt").ExtractJwt;
 
-var opts = {}
-opts.jwtFromRequest = ExtractJWT.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = 'secret';
-
-passport.use(new JWTStrategy(opts,
-    function (jwtPayload, cb) {
-          console.log(jwtPayload);
-        //find the user in db if needed
-        return Users.findOneById(jwtPayload.id)
-            .then(user => {
-                return cb(null, user);
-            })
-            .catch(err => {
-                return cb(err);
-            });
-    }
-));
+passport.use(new JwtStrategy(
+  {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: process.env.SECRET_KEY,
+  },
+  (jwt_payload, done) => {
+    let { id } = jwt_payload.user
+    return Users
+      .query()
+      .findById(id)
+      .then((user) => {
+        // Add logic if theres an error. But must check what err Objection throws back if its a DB error
+        // --insert db error handling
+        if (user) return done(null, user)
+        else {
+          return done(null, false)
+          // can add things like create user / etc ..
+        }
+      })
+}));
 
 
 passport.use(new LocalStrategy(

@@ -16,12 +16,4 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/api', passport.authenticate('jwt', {session: false}), ApiRoutes)
 app.use('/admin', AdminRoutes)
 
-
-app.use(passport.authenticate('jwt', { session: false }));
-
-
-app.use('/', (req, res) => {
-  res.send('hi')
-})
-
 app.listen(process.env.PORT, () => console.log(`Server running on ${process.env.PORT}`))

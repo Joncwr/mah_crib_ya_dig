@@ -22,9 +22,8 @@ router.post('/createUser', (req, res) => {
   })
 })
 
-router.post('/login', (req, res, next) => {
+router.post('/login', (req, res) => {
   passport.authenticate('local', {session: false}, (err, user, info) => {
-    console.log(err, user, info);
     if (err || !user) {
       return res.status(401).json({
         message: 'Login failed.',
@@ -34,9 +33,13 @@ router.post('/login', (req, res, next) => {
       if (err) {
           res.send(err);
       }
+      let userDetails = {
+        id: user.id,
+        username: user.username
+      }
       // generate a signed son web token with the contents of user object and return it in the response
-      const token = jwt.sign(user.toJSON(), 'your_jwt_secret');
-      return res.json({user, token});
+      const token = jwt.sign({ user: userDetails }, process.env.SECRET_KEY);
+      return res.json({userDetails, token});
    });
   })(req, res)
 })
