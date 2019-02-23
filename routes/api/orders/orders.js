@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router()
 const moment = require('moment')
 const Orders = (require('../../../models/orders'))
-const Users = (require('../../../models/users'))
 
 router.post('/createOrder/:users_id', (req, res) => {
   const { name, period, date, comments } = req.body
@@ -24,13 +23,14 @@ router.post('/createOrder/:users_id', (req, res) => {
   .catch(err => res.send(err))
 })
 
-router.get('/getOrder/:order_id', (req,res) => {
-  const { order_id } = req.params
-  return Orders
-    .query()
-    .where({ id: order_id })
-    .then(order => res.json(order))
-})
+// get single order - not sure if will be used
+// router.get('/getOrder/:order_id', (req,res) => {
+//   const { order_id } = req.params
+//   return Orders
+//     .query()
+//     .where({ id: order_id })
+//     .then(order => res.json(order))
+// })
 
 router.get('/getOrders/:user_id', (req,res) => {
   const { user_id } = req.params
@@ -46,7 +46,7 @@ router.get('/getAllOrders', (req,res) => {
     .then(orders => res.json(orders))
 })
 
-router.get('/deleteOrder/:order_id', (req,res) => {
+router.delete('/deleteOrder/:order_id', (req,res) => {
   const { order_id } = req.params
   return Orders
     .query()
@@ -58,7 +58,7 @@ router.get('/deleteOrder/:order_id', (req,res) => {
     })
 })
 
-router.get('/deleteLastOrder/:user_id', (req,res) => {
+router.delete('/deleteLastOrder/:user_id', (req,res) => {
   const { user_id } = req.params
   return Orders
     .query()
