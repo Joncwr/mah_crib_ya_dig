@@ -1,25 +1,44 @@
 const express = require('express')
 const router = express.Router()
-const moment = require('moment')
 const SavedOrders = (require('../../../models/SavedOrders'))
+const Users = (require('../../../models/Users'))
 
 router.post('/saveOrder/:user_id', (req, res) => {
   const { user_id } = req.params
   const { name, period, date, comments } = req.body
 
-  return SavedOrders
+  return Users
     .query()
-    .insert({
-      name,
-      period,
-      date: moment(date,'DD/MM/YYYY').format(),
-      comments,
-      users_id: user_id
+    .where({ id: user_id })
+    .eager('savedOrders')
+    .then(([user]) => {
+      let savedOrders = user.savedOrders
+      let isUnique = true
+      savedOrders.forEach((data, index) => {
+        if (name === data.name) {
+          isUnique = false
+          res.json({
+            error: 'same name error',
+            order: data
+          })
+        }
+      })
+      if (isUnique) {
+        return SavedOrders
+          .query()
+          .insert({
+            name,
+            period,
+            date,
+            comments,
+            users_id: user_id
+          })
+          .then(order => {
+            if (order) res.sendStatus(200)
+          })
+          .catch(err => res.send(err))
+      }
     })
-  .then(order => {
-    if (order) res.sendStatus(200)
-  })
-  .catch(err => res.send(err))
 })
 
 router.get('/getSavedOrders/:user_id', (req,res) => {

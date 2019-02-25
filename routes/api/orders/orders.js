@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
-const moment = require('moment')
 const Orders = (require('../../../models/orders'))
+const Users = (require('../../../models/users'))
 
 router.post('/createOrder/:users_id', (req, res) => {
   const { name, period, date, comments } = req.body
@@ -11,7 +11,7 @@ router.post('/createOrder/:users_id', (req, res) => {
     .insert({
       name,
       period,
-      date: moment(date,'DD/MM/YYYY').format(),
+      date,
       comments,
       users_id: user_id
     })
@@ -34,16 +34,24 @@ router.post('/createOrder/:users_id', (req, res) => {
 
 router.get('/getOrders/:user_id', (req,res) => {
   const { user_id } = req.params
-  return Orders
+  return Users
     .query()
-    .where({ users_id: user_id })
-    .then(orders => res.json(orders))
+    .where({ id: user_id })
+    .select('username')
+    .eager('orders')
+    .then(orders => {
+      res.json(orders)
+    })
 })
 
 router.get('/getAllOrders', (req,res) => {
-  return Orders
+  return Users
     .query()
-    .then(orders => res.json(orders))
+    .whereExists(Users.relatedQuery('orders'))
+    .eager('orders')
+    .then(users => {
+      res.send(users)
+    })
 })
 
 router.delete('/deleteOrder/:order_id', (req,res) => {
@@ -104,8 +112,8 @@ router.put('/orderNotCompleted/:order_id', (req,res) => {
 
 // TEST
 router.get('/test', (req,res) => {
-  return Orders
-    .query()
+  return Users
+    .loadRelated(['orders', 'users'], 'orders.name')
     .then(orders => res.json(orders))
 })
 
