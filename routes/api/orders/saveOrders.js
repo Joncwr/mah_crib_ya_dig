@@ -29,7 +29,6 @@ router.post('/saveOrder/:user_id', (req, res) => {
           .insert({
             name,
             period,
-            date,
             comments,
             users_id: user_id
           })

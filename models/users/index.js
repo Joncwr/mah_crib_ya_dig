@@ -23,6 +23,15 @@ class Users extends Model {
           from: 'users.id',
           to: 'saved_orders.users_id'
         }
+      },
+
+      households: {
+        relation: Model.BelongsToOneRelation,
+        modelClass: require('../households'),
+        join: {
+          from: 'users.household_id',
+          to: 'households.id'
+        }
       }
     }
   }
