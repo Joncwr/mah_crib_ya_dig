@@ -6,7 +6,7 @@ exports.up = function(knex, Promise) {
 };
 
 exports.down = function(knex, Promise) {
-  return knex.schema.table('orders', t => {
+  return knex.schema.alterTable('orders', t => {
     t.dropColumn('isDone')
   })
 };
