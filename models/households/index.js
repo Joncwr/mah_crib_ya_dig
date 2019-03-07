@@ -1,6 +1,6 @@
 const { Model } = require('../../db')
 
-class Orders extends Model {
+class Households extends Model {
   static get tableName() {
     return 'households';
   }
@@ -19,4 +19,4 @@ class Orders extends Model {
   }
 }
 
-module.exports = Orders;
+module.exports = Households;

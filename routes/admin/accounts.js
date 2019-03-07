@@ -2,24 +2,40 @@ const express = require('express')
 const router = express.Router()
 const { saltHashPassword, randomString } = require('../../helpers/store')
 const Users = require('../../models/users')
+const Households = require('../../models/households')
 const jwt = require('jsonwebtoken')
 const passport = require('passport')
 
 router.post('/createUser', (req, res) => {
-  const { username, password } = req.body
-  const { salt, hash } = saltHashPassword({ password })
-
-  return Users
+  const { household_name } = req.body
+  return Households
     .query()
-    .insert({
-      username,
-      password_hash: hash,
-      salt_bae: salt
+    .where({ name: household_name })
+    .then(household => {
+      if (household.length > 0) {
+        const { username, password } = req.body
+        const { salt, hash } = saltHashPassword({ password })
+    
+        return Users
+          .query()
+          .insert({
+            username,
+            password_hash: hash,
+            salt_bae: salt,
+            household_id: household[0].id
+          })
+          .then(user => {
+            if (user) res.sendStatus(200)
+            else res.sendStatus(401)
+        })
+      }
+      else {
+        res.json({
+          status: false,
+          error: 'No household found.'
+        })
+      }
     })
-    .then(user => {
-      if (user) res.sendStatus(200)
-      else res.sendStatus(401)
-  })
 })
 
 router.post('/login', (req, res) => {

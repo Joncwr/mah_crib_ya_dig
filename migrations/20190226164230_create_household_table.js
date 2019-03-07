@@ -2,7 +2,7 @@
 exports.up = function(knex, Promise) {
   return knex.schema.createTable('households', t => {
     t.increments('id').primary()
-    t.string('name').notNullable()
+    t.string('name').notNullable().unique()
     t.timestamps(false, true)
   })
 };

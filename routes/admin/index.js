@@ -4,6 +4,6 @@ const AccountsApi = require('./accounts')
 const HouseholdsApi = require('./households')
 
 router.use('/', AccountsApi)
-router.use('/', HouseholdsApi)
+router.use('/households', HouseholdsApi)
 
 module.exports = router
